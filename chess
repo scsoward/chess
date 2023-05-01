@@ -1,0 +1,238 @@
+onEvent("button1", "click", function( ) {
+  var start = gameToCode(errorCheck(getText("text_input1")));
+  var end = gameToCode(errorCheck(getText("text_input2")));
+  movePiece(start,end);
+  setText("text_area2", toDisplay(board));
+});
+// Define the starting position of the pieces
+var startingPosition = [
+  ["R", "N", "B", "Q", "K", "B", "N", "R"],
+  ["P", "P", "P", "P", "P", "P", "P", "P"],
+  [" ", " ", " ", " ", " ", " ", " ", " "],
+  [" ", " ", " ", " ", " ", " ", " ", " "],
+  [" ", " ", " ", " ", " ", " ", " ", " "],
+  [" ", " ", " ", " ", " ", " ", " ", " "],
+  ["p", "p", "p", "p", "p", "p", "p", "p"],
+  ["r", "n", "b", "q", "k", "b", "n", "r"]
+];
+var board = [
+//array positions //board[1][1]               /* actual game*/
+  /*0*/["R", "N", "B", "Q", "K", "B", "N", "R"],/*8*/
+  /*1*/["P", "P", "P", "P", "P", "P", "P", "P"],/*7*/
+  /*2*/[" ", " ", " ", " ", " ", " ", " ", " "],/*6*/
+  /*3*/[" ", " ", " ", " ", " ", " ", " ", " "],/*5*/
+  /*4*/[" ", " ", " ", " ", " ", " ", " ", " "],/*4*/
+  /*5*/[" ", " ", " ", " ", " ", " ", " ", " "],/*3*/
+  /*6*/["p", "p", "p", "p", "p", "p", "p", "p"],/*2*/
+  /*7*/["r", "n", "b", "q", "k", "b", "n", "r"] /*1*/
+  ///  [0,a 1,b   2,c  3,d  4,e  5,f  6,g  7,h]
+];
+function movePiece(st,en) {
+  var cSt = st.charAt(1);
+  var rSt = st.charAt(0);
+  var cEn = en.charAt(1);
+  var rEn = en.charAt(0);
+  //checks if moving PAWN and if its a valid move
+  if (board[parseInt(cSt)][parseInt(rSt)]=="P"||board[parseInt(cSt)][parseInt(rSt)]=="p"){
+    if (!pawnValidMove(st,en)){
+     invalidMove(); 
+    }
+  }
+  //checks if moving ROOK and if its a valid move
+  if (board[parseInt(cSt)][parseInt(rSt)]=="R"||board[parseInt(cSt)][parseInt(rSt)]=="r"){
+    if (!rookValidMove(st,en)){
+     invalidMove(); 
+    }
+  }
+  //checks if moving KNIGHT and if its a valid move
+  if (board[parseInt(cSt)][parseInt(rSt)]=="N"||board[parseInt(cSt)][parseInt(rSt)]=="n"){
+    if (!knightValidMove(st,en)){
+     invalidMove(); 
+    }
+  }
+  //checks if moving BISHOP and if its a valid move
+  if (board[parseInt(cSt)][parseInt(rSt)]=="B"||board[parseInt(cSt)][parseInt(rSt)]=="b"){
+    if (!bishopValidMove(st,en)){
+     invalidMove(); 
+    }
+  }
+  //checks if moving QUEEN and if its a valid move
+  if (board[parseInt(cSt)][parseInt(rSt)]=="Q"||board[parseInt(cSt)][parseInt(rSt)]=="q"){
+    if (!queenValidMove(st,en)){
+     invalidMove(); 
+    }
+  }
+  //checks if moving KING and if its a valid move
+  if (board[parseInt(cSt)][parseInt(rSt)]=="K"||board[parseInt(cSt)][parseInt(rSt)]=="k"){
+    if (!kingValidMove(st,en)){
+     invalidMove(); 
+    }
+  }
+  board[parseInt(cEn)][parseInt(rEn)]=board[parseInt(cSt)][parseInt(rSt)];
+  board[parseInt(cSt)][parseInt(rSt)]=" ";
+  setText("text_area1","Good move");
+}
+function gameToCode(te){
+  var column = te.charAt(0);
+  var row = te.charAt(1);
+  if (column !== "a" && column !== "b" && column !== "c" && column !== "d" && column !== "e" && column !== "f" && column !== "g" && column !== "h") {
+    // If the column is not a valid character, return an error
+    return "Error: Invalid column input";
+  }
+  if (row !== "1" && row !== "2" && row !== "3" && row !== "4" && row !== "5" && row !== "6" && row !== "7" && row !== "8") {
+    // If the row is not a valid character, return an error
+    setText("text_area1","Error: Invalid row input");
+  }
+  if (column == "a") column = 0;if (column == "b") column = 1;if (column == "c") column = 2;
+  if (column == "d") column = 3;if (column == "e") column = 4;if (column == "f") column = 5;
+  if (column == "g") column = 6;if (column == "h") column = 7;
+  if (row == 1) row =7;if(row == 2) row =6;if(row == 3) row =5;
+  if (row == 5) row =3;if (row == 6) row =2;if(row == 7) row =1;if(row == 8) row =0;
+  return (row+ "" +column);
+}
+function errorCheck(te){
+  var c1 = te.charAt(0);
+  var c2 = te.charAt(1);
+  if (c1!="a"&&c1!="b"&&c1!="c"&&c1!="d"&&c1!="e"&&c1!="f"&&c1!="g"&&c1!="h"){
+    setText("text_area1","Invalid input");
+    return;
+  }
+  else{
+    return c1+c2;
+  }
+}
+onEvent("button2", "click", function( ) {
+  board = startingPosition;
+});
+function invalidMove() {
+  setText("text_area1","Invalid move");
+}
+function pawnValidMove(st,en){
+  var cSt = parseInt(st.charAt(1));
+  var rSt = parseInt(st.charAt(0));
+  var cEn = parseInt(en.charAt(1));
+  var rEn = parseInt(en.charAt(0));
+  var piece = board[rSt][cSt].toLowerCase();
+  // Moving the pawn 1 step forward
+  if (cSt == cEn && board[rEn][cEn] == " " && ((piece == "p" && rEn == rSt - 1) || (piece == "P" && rEn == rSt + 1))) {
+    return true;
+  }
+  // Moving the pawn 2 steps forward
+  if (cSt == cEn && board[rEn][cEn] == " " && ((piece == "p" && rSt == 6 && rEn == rSt - 2) || (piece == "P" && rSt == 1 && rEn == rSt + 2))) {
+    return true;
+  }
+  // Capturing a piece
+  if ((piece == "p" && rEn == rSt - 1 && (cEn == cSt + 1 || cEn == cSt - 1) && board[rEn][cEn] != " ") || (piece == "P" && rEn == rSt + 1 && (cEn == cSt + 1 || cEn == cSt - 1) && board[rEn][cEn] != " ")) {
+    return true;
+  }
+  return false;
+}
+function rookValidMove(st,en){
+  var cSt = parseInt(st.charAt(1));
+  var rSt = parseInt(st.charAt(0));
+  var cEn = parseInt(en.charAt(1));
+  var rEn = parseInt(en.charAt(0));
+  // check if start and end positions are not the same
+  if (st === en) {
+    return false;
+  }
+  // check if the rook is moving in a straight line
+  if (!(cSt === cEn || rSt === rEn)) {
+    return false;
+  }
+  // check if the path is clear of other pieces
+  if (cSt === cEn) { // moving vertically
+    var minR = Math.min(rSt, rEn);
+    var maxR = Math.max(rSt, rEn);
+    for (var i = minR + 1; i < maxR; i++) {
+      if (board[i][cSt] !== " ") {
+        return false;
+      }
+    }
+  } else { // moving horizontally
+    var minC = Math.min(cSt, cEn);
+    var maxC = Math.max(cSt, cEn);
+    for (var j = minC + 1; j < maxC; j++) {
+      if (board[rSt][j] !== " ") {
+        return false;
+      }
+    }
+  }
+  // check if the destination position is empty or has an opponent's piece
+  var piece = board[rSt][cSt].toLowerCase();
+  var destPiece = board[rEn][cEn].toLowerCase();
+  if (destPiece === " " || (piece !== destPiece && piece !== " ")) {
+    return true;
+  }
+  return false;
+}
+function knightValidMove(st,en){
+  var cSt = parseInt(st.charAt(1));
+  var rSt = parseInt(st.charAt(0));
+  var cEn = parseInt(en.charAt(1));
+  var rEn = parseInt(en.charAt(0));
+  var dx = Math.abs(cEn - cSt);
+  var dy = Math.abs(rEn - rSt);
+  return (dx == 1 && dy == 2) || (dx == 2 && dy == 1);
+}
+function bishopValidMove(st, en) {
+  var cSt = parseInt(st.charAt(1));
+  var rSt = parseInt(st.charAt(0));
+  var cEn = parseInt(en.charAt(1));
+  var rEn = parseInt(en.charAt(0));
+  var rowDiff = Math.abs(rEn - rSt);
+  var colDiff = Math.abs(cEn - cSt);
+  
+  // Check if the move is diagonal and there are no obstructions
+  if (rowDiff == colDiff) {
+    //checks which is greater and sets accordingly csharp
+    var rowStep = rSt < rEn ? 1 : -1;
+    var colStep = cSt < cEn ? 1 : -1;
+    var row = rSt + rowStep;
+    var col = cSt + colStep;
+    while (row != rEn && col != cEn) {
+      if (board[row][col] != " ") {
+        return false;
+      }
+      row += rowStep;
+      col += colStep;
+    }
+    return true;
+  }
+  return false;
+}
+function queenValidMove(st,en){
+  if (bishopValidMove(st,en)&&rookValidMove(st,en)){
+    return true;
+  }
+  else {return false;}
+}
+function kingValidMove(st, en) {
+  var cSt = st.charAt(1);
+  var rSt = st.charAt(0);
+  var cEn = en.charAt(1);
+  var rEn = en.charAt(0);
+
+  // The king can only move one square in any direction
+  if (Math.abs(cSt - cEn) <= 1 && Math.abs(rSt - rEn) <= 1) {
+    // Make sure the king is not moving onto a square that is occupied by a piece of the same color
+    if (board[parseInt(cEn)][parseInt(rEn)] == " " || board[parseInt(cEn)][parseInt(rEn)].toUpperCase() != board[parseInt(cSt)][parseInt(rSt)].toUpperCase()) {
+      return true;
+    }
+  }
+  return false;
+}
+function toDisplay(board) {
+  var result = "";
+  for (var i = 0; i < board.length; i++) {
+    if (board[i]>= "a" && board[i] <= "z"){
+      result += board[i].join("  ") + "\n";
+    }
+    else{
+      result += board[i].join(" ") + "\n";
+    }
+  }
+  return result;
+}
+
+setText("text_area2", toDisplay(board));
